@@ -1,76 +1,67 @@
+**English** ｜ [简体中文](README.zh.md) ｜ [日本語](README.ja.md)
+
 # desk-and-drawer
 
-**桌面上只放正在干的活，干完的活收进抽屉。** 一套让 AI 协作项目的权威 markdown 文档（进度看板、决策账本）不再无限变长的治理方案：方法论＋体积门禁＋起步模板＋迁移手册。
+**Keep your desk clear; put finished work in the drawer.** A governance kit that stops an AI-agent project's authoritative markdown docs (progress board, decision ledger) from growing without bound: a playbook + a size gate + starter templates + a migration manual.
 
-> **EN summary** — *Keep your desk clear; put finished work in the drawer.* A playbook + two tiny
-> scripts that keep an AI-agent project's authoritative markdown docs (progress board, decision
-> ledger) from growing without bound. Everything stays in human-readable, git-native markdown:
-> history rotates into `docs/archive/` on mandatory checkpoints, a size-gate script is the
-> *single* rotation trigger, and migrations are move-only with mechanical conservation proofs
-> (multiset / sha256 assertions). Adjacent tools lint context files (ctxlint, AgentLinter) or
-> replace markdown with a database (Beads); this governs the *lifecycle of the docs themselves*.
-> Chinese is the primary language for now; an English translation of the playbook is planned.
+## What this is
 
----
+Long-running AI-collaboration projects (Claude Code / Codex / Cursor…) accumulate authoritative docs — a progress board, a decision ledger. **A doc with rules for writing but no rules for archiving grows without bound** — until any read or grep blows up the agent's context window, and every newly onboarded agent pays that tax again.
 
-## 这是什么
+This repo is the cure, and everything stays in human-readable, git-native markdown:
 
-长期跑 AI 协作（Claude Code / Codex / Cursor…）的项目，权威文档——进度看板、决策账本——**只要有"怎么记"的规则、没有"怎么归档"的规则，就必然无限变长**，最后把每一任接手 agent 的上下文窗顶爆。
+- A methodology: [`PLAYBOOK.md`](PLAYBOOK.md) — the desk/drawer architecture and five rules bound to mandatory checkpoints *(currently in Chinese; translation planned)*
+- Two scripts: [`tools/check_doc_size.py`](tools/check_doc_size.py) (the size gate — **a red is the single rotation trigger**) and [`tools/build_decisions_index.py`](tools/build_decisions_index.py) (a deterministic, mechanically generated ledger index)
+- Four starter templates: [`templates/`](templates/) — decision ledger / progress board / agent entry doc / archive directory
+- A migration manual: [`MIGRATION.md`](MIGRATION.md) — for projects that have already grown out of control, with copy-paste conservation assertions *(currently in Chinese)*
 
-本仓库是治这个病的一套**留在 markdown 里**的方案：
+## What this is not (related work)
 
-- 一份方法论：[`PLAYBOOK.md`](PLAYBOOK.md)（桌面/抽屉分工、五条绑在必经动作上的规矩）
-- 两个脚本：[`tools/check_doc_size.py`](tools/check_doc_size.py)（体积门禁，**报红＝轮转的唯一触发**）、[`tools/build_decisions_index.py`](tools/build_decisions_index.py)（决策索引，机械生成、确定性输出）
-- 三份起步模板：[`templates/`](templates/)（决策账本／进度看板／归档目录）
-- 一份迁移手册：[`MIGRATION.md`](MIGRATION.md)（给已经长大的项目，含"只挪不改"的机械核数代码片段）
+An honest disclosure: **this is not an invention — it is a synthesis** of long-established practices (log rotation, ADRs, append-only ledgers, size caps). The gap it fills: nobody had packaged the *archive lifecycle* as an executable discipline.
 
-## 这不是什么（相关工作对照）
-
-诚实声明：**这不是一个发明，是对既有实践的组合**（日志轮转、ADR、append-only 账本、体积上限），填的空档是"没人把归档生命周期打包成可执行的纪律"。相邻项目与本仓的分工：
-
-| 项目 | 它做什么 | 与本仓的关系 |
+| Project | What it does | Relation to this kit |
 |---|---|---|
-| [Beads](https://github.com/steveyegge/beads) | 把任务追踪从 markdown 换成 git 内嵌数据库 | 不同赛道：它换存储，本仓留在 markdown 里治叙事文档；互补不竞争 |
-| [ctxlint](https://github.com/YawLabs/ctxlint) | 对 CLAUDE.md/AGENTS.md 做"与代码库对不对得上"的 lint | 相邻：它治上下文文件的漂移，本仓治权威文档的生命周期 |
-| [agents-md](https://github.com/ivawzh/agents-md) | AGENTS.md 分片组装＋CI 体积限制 | 相邻：同样用体积门禁思路，但对象是 agent 指令文件 |
-| [AgentLinter](https://agentlinter.com/) | CLAUDE.md 评分/诊断 | 相邻：lint 内容质量，不管历史归档 |
-| [memory-trail](https://github.com/frmoretto/memory-trail) | 决策记忆＋会话日志 | 相邻：记录"为什么"，无轮转机制 |
-| ADR（架构决策记录） | 一决策一文件＋索引 | 本仓账本模式的思想来源之一 |
-| [OpenSpec](https://github.com/Fission-AI/OpenSpec) | 规格驱动开发，Propose→Apply→**Archive** | 它的 Archive 环节与本仓"做完就归档"同源 |
+| [Beads](https://github.com/steveyegge/beads) | Replaces markdown task tracking with a git-embedded database | Different lane: it swaps the storage; this kit stays in markdown and governs the narrative docs. Complementary, not competing |
+| [ctxlint](https://github.com/YawLabs/ctxlint) | Lints CLAUDE.md/AGENTS.md against your actual codebase | Adjacent: it fights drift in context files; this kit governs the lifecycle of authority docs |
+| [agents-md](https://github.com/ivawzh/agents-md) | Composable AGENTS.md fragments with CI size limits | Adjacent: the same size-gate instinct, applied to agent instruction files |
+| [AgentLinter](https://agentlinter.com/) | Scores and diagnoses CLAUDE.md | Adjacent: lints content quality; no history archiving |
+| [memory-trail](https://github.com/frmoretto/memory-trail) | Decision memory + session logs | Adjacent: records the "why"; no rotation mechanism |
+| ADR (Architecture Decision Records) | One decision per file + an index | One of the ideas this kit's ledger pattern descends from |
+| [OpenSpec](https://github.com/Fission-AI/OpenSpec) | Spec-driven development: Propose → Apply → **Archive** | Its Archive step shares this kit's "done means archived" principle |
 
-理念上游：Anthropic《[Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)》；OpenAI Codex 对项目说明文档的 32KiB 硬上限（工具强制、不信自觉——本仓门禁的态度来源）。
+Upstream ideas: Anthropic's [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents); OpenAI Codex's hard 32 KiB cap on project docs (enforcement by tooling rather than willpower — the attitude this kit's gate inherits).
 
-## 快速开始（新项目第一天）
+## Quick start (day one of a new project)
 
-1. 把 `templates/docs/` 复制进你的仓库——决策账本／进度看板／**入口文档 HANDOFF.md**／归档目录各就位。
-2. 把 `tools/` 两个脚本复制过去，改 `check_doc_size.py` 顶部的 `CONFIG`（文件名＋预算；预算 = 实测体积 × 1.5–2.5），然后跑一次 `python3 tools/build_decisions_index.py` 生成索引。
-3. 打开 `docs/HANDOFF.md` 按注释填空；如果你的 agent 用 CLAUDE.md / AGENTS.md，把里面那段「固定阅读顺序＋必跑门禁」抄进去。
-4. 从第一条决策起就守规矩：一条一行、编号连续、append-only。
-5. 门禁报红时照红字里的处方轮转——**不许调预算了事**。
+1. Copy `templates/docs/` into your repo — decision ledger / progress board / **agent entry doc `HANDOFF.md`** / archive directory, all in place.
+2. Copy `tools/` over, edit the `CONFIG` block at the top of `check_doc_size.py` (file names + budgets; budget = measured size × 1.5–2.5), then run `python3 tools/build_decisions_index.py` once.
+3. Open `docs/HANDOFF.md` and fill in the blanks; if your agent uses CLAUDE.md / AGENTS.md, paste its "fixed reading order + mandatory gates" section there.
+4. Follow the rules from decision #1: one line per decision, contiguous numbering, append-only.
+5. When the gate goes red, rotate as the red text prescribes — **never "fix" it by raising the budget**.
 
-已经长大的项目 → 直接看 [`MIGRATION.md`](MIGRATION.md)。
+Already-grown project → go straight to [`MIGRATION.md`](MIGRATION.md).
 
-## 怎么绑进日常（纪律必须挂在必经动作上）
+## Wiring it into daily work (discipline must ride on mandatory actions)
 
-- **agent 侧**：入口文档的必跑清单里有门禁（模板已带）——每个新会话接手第一步就会跑。
-- **人类侧**：想在提交时强制，加一个 pre-commit hook 即可：
+- **Agent side**: the entry-doc template ships with the gate on its mandatory checklist — every new session runs it as takeover step one.
+- **Human side**: to enforce at commit time, add a pre-commit hook:
 
   ```bash
   printf '#!/bin/sh\npython3 tools/check_doc_size.py || exit 1\n' > .git/hooks/pre-commit
   chmod +x .git/hooks/pre-commit
   ```
 
-- **CI 侧**：脚本退出码 0/1、无任何依赖（纯标准库），在任何 CI 里加一行 `python3 tools/check_doc_size.py` 就是一道必过检查。
+- **CI side**: the script is stdlib-only with exit codes 0/1 — one line, `python3 tools/check_doc_size.py`, makes it a required check in any CI.
 
-## 实战数字（出处：一个跑了 7 周的私有 iOS 项目）
+## Numbers from the field (a private iOS project, 7 weeks in)
 
-治理前：进度看板 663KB / 1,763 行，决策账本 819KB / 274 条挤一张表，**最粗的一行 76,234 字节**——任何读取或 grep 碰到它就把 agent 的上下文窗顶爆。治理后：live 看板 237KB / 569 行、账本 112KB（留最近 30 条），最长行 1,688 字符；**历史零丢失**（迁移脚本断言：内容拼接 sha256 与原文一致、决策号 1..274 连续无缺无重、任务行 118 = 归档 109 + 保留 9）。全程 6 个提交，每步之间全部门禁绿才推进。
+Before: progress board 663 KB / 1,763 lines; decision ledger 819 KB with 274 decisions crammed into one table; **the fattest single line was 76,234 bytes** — any read or grep touching it blew up the agent's context window. After: live board 237 KB / 569 lines; ledger 112 KB (30 most recent decisions); longest line 1,688 chars; **zero history lost** (asserted by the migration scripts: stripped-newline reassembly matches the original by sha256; decision numbers 1..274 contiguous with no gaps or dupes; task rows 118 = 109 archived + 9 kept). Six commits, every gate green between each step.
 
 ## FAQ
 
-**Q：为什么不直接用 Beads？** 新项目完全可以（见 PLAYBOOK §四）。选本仓的理由通常是：产品所有者要**直接读 markdown** 掌握项目、不想加二进制依赖、或项目已有大量 markdown 资产不宜中途换存储。
+**Q: Why not just use Beads?** For a brand-new project — absolutely consider it (PLAYBOOK §4). Pick this kit when the product owner needs to **read the markdown directly**, you don't want a binary dependency, or the project already has too many markdown assets to switch storage mid-flight.
 
-**Q：被 fork 进具体项目之后听谁的？** 听项目内的规则文档。本仓库是上游模板；fork 后的分歧属正常演化，不必回流。
+**Q: After forking this into a project, which side wins?** The project's own rules doc. This repo is the upstream template; divergence after forking is normal evolution and doesn't need to flow back.
 
 ## License
 
