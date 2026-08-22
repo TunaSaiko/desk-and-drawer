@@ -1,53 +1,60 @@
-# 迁移手册：给已经长大的项目
+**English** ｜ [简体中文](MIGRATION.zh.md) ｜ [日本語](MIGRATION.ja.md)
 
-新项目请直接用 `templates/`（见 README 快速开始）。本手册给**权威文档已经失控**的项目：如何把历史搬进归档而不丢一个字。出处案例：一个跑了 7 周的私有项目，看板 663KB、账本 819KB、最粗一行 76,234 字节；迁移后 live 分别 237KB / 112KB，历史零丢失。
+# The Migration Manual: for projects that have already grown
 
-## 三条铁律（先背下来再动手）
+New projects should just use `templates/` (see the README quick start). This manual is for projects whose **authoritative docs are already out of control**: how to move history into the archive without losing a single character. Source case: a private project seven weeks in — board 663 KB, ledger 819 KB, fattest single line 76,234 bytes; after migration the live files were 237 KB / 112 KB with zero history lost.
 
-1. **只挪不改**：纯移动，内容一字不改；用 sha256 / multiset 断言证明（代码见下）。
-2. **编号不动**：决策号/任务号永不改，全仓「见 D141」式交叉引用在归档后依然全部有效。
-3. **脚本核数**：所有断言**通过之后才落盘**——断言失败就一个字节都不写（我们第一版脚本就是被自己的断言拦下来的，拦得对）。
+## Three iron rules (memorize before touching anything)
 
-## 五步顺序（每步之间：门禁全绿 → 提交 → 推远端）
+1. **Move, never edit**: pure relocation, not one character changed; proven by sha256 / multiset assertions (code below).
+2. **Numbers never change**: decision and task IDs are permanent, so every "see D141"-style cross-reference in the repo still resolves after archiving.
+3. **Script-verified conservation**: write to disk **only after every assertion passes** — if one fails, not a single byte is written. (Our own v1 script was stopped by its own assertions. It was right to be stopped.)
 
-1. **留痕决策 ＋ 拆掉最痛的单行怪物**。谁拍板、为什么、代价，先记进账本；然后把超级长行整体移入归档（只插换行、不改一字），live 换成一行短快照并写明「整行替换」新纪律。
-2. **看板三块历史搬家**：阶段流水／已关账任务行／历史更新流水 → 归档三文件，原地留指针；任务表用**区间行**（如 `| T1–T115 | … | 已关账 | — |`）保住"每个任务在表里可寻址"。
-3. **账本按百分段归档**（D001–D100 一档），live 留最近约 30 条；生成索引。
-4. **门禁上线**（`tools/check_doc_size.py`，改 CONFIG）＋ 把规矩写进你的规则文档、把"跑门禁"写进 agent 入口文档。**门禁名册与阅读顺序要在同一提交里更新**——"门禁长出来了、名单没跟上"是高复发漂移。
-5. **收尾核对**：全部门禁绿、`git status` 干净、推远端；把迁移脚本连同其断言输出留在仓库里当证据。
+## The five-step order (between every step: all gates green → commit → push)
 
-## 四个实战教训（每条都真踩过）
+1. **Record the decision, then defuse the worst single-line monster.** Who approved, why, at what cost — into the ledger first; then move the mega-line wholesale into the archive (inserting newlines only, changing nothing), and replace it in the live file with a one-line snapshot plus the new "replace whole line" rule written right there.
+2. **Move the board's three history blocks**: the stage log / closed task rows / the update log → three archive files, pointers left in place; use a **range row** in the task table (e.g. `| T1–T115 | … | closed | — |`) to keep "every task is addressable in the table" true.
+3. **Archive the ledger in blocks of one hundred** (D001–D100 per file), keep the ~30 most recent live; generate the index.
+4. **Bring the gate online** (`tools/check_doc_size.py`, edit CONFIG) + write the rules into your rules doc and "run the gate" into the agent entry doc. **The gate roster and the reading order must be updated in the same commit** — "a gate grew but the roster didn't" is a high-recurrence drift.
+5. **Final sweep**: all gates green, `git status` clean, pushed; keep the migration scripts and their assertion output in the repo as evidence.
 
-- **内容锚定，不用行号**。迁移脚本用节标题定位（`find(lines, "## 二、")`），别用行号——多会话并行时行号随时被别人推移（出处项目迁移当天中途就被另一会话插了一个提交）。
-- **依赖这些文档的工具，语料要在同一提交里跟上**。出处项目有个"前作体检"工具以任务表为语料；任务行归档后若不把归档文件并进语料，这个工具的立身案例自己就会漏报。搬家前先 `grep -l` 找出所有读这些文档的脚本。
-- **报数字先说清单位**。BSD `awk length` 数字节、Python `len` 数字符，差 2 倍多；出处项目差点把"76,234 字符"（实为字节）留在文档里给未来的核对者制造假漂移。
-- **搬完做一次真实阳性对照**。门禁上线当天用 `--probe` 把预算压到当前值以下 → 确认报红 → 恢复 → 确认变绿，把这三步写进工序记录——"量尺自己坏了还报绿"比没有量尺更糟。
+## Four field lessons (each one actually happened)
 
-## 断言代码片段（抄进你的迁移脚本）
+- **Anchor on content, not line numbers.** Locate sections by their headings (`find(lines, "## 2.")`), never by line number — with parallel sessions, someone else can shift your line numbers at any moment (the source project had another session land a commit mid-migration, same day).
+- **Tools that read these docs must have their corpus extended in the same commit.** The source project had a "prior-art check" tool whose corpus was the task table; without folding the archive file into the corpus, the tool's own founding case would have become a false negative. Before moving anything, `grep -l` for every script that reads these docs.
+- **State the unit before reporting a number.** BSD `awk length` counts bytes, Python `len` counts characters — more than a 2× difference on CJK text; the source project nearly shipped "76,234 characters" (actually bytes) into a doc, manufacturing fake drift for future auditors.
+- **Run one real positive control after the move.** The day the gate goes live: `--probe` the budget below the current size → confirm red → restore → confirm green, and write those three steps into the work log — a measuring stick that is broken but still reports green is worse than no stick.
+
+## Assertion snippets (copy into your migration script)
 
 ```python
 from collections import Counter
 import hashlib, re
 
-# ① 只挪不改（整行搬家类）：原文件行 == 新 live 行 ⊎ 各归档移出行 − 显式登记的新增行
+# 1) Move-never-edit (whole-line relocations): original lines ==
+#    new live lines ⊎ each batch of moved-out lines − explicitly
+#    registered additions
 new_c = Counter(new_lines) + Counter(moved_a) + Counter(moved_b)
-new_c.subtract(added_to_live)          # 指针/区间行/存根，逐条显式登记
+new_c.subtract(added_to_live)          # pointers/range rows/stubs, registered one by one
 diff  = {k: v for k, v in (new_c - Counter(orig_lines)).items() if k.strip()}
 diff2 = {k: v for k, v in (Counter(orig_lines) - new_c).items() if k.strip()}
-assert not diff and not diff2, ("多出", list(diff)[:3], "丢失", list(diff2)[:3])
+assert not diff and not diff2, ("extra", list(diff)[:3], "lost", list(diff2)[:3])
 
-# ② 只挪不改（拆长行类）：拆行后去换行必须还原原行
+# 2) Move-never-edit (line-splitting): stripping the inserted newlines
+#    must reproduce the original line exactly
 assert split_text.replace("\n", "") == original_line
 assert hashlib.sha256(split_text.replace("\n", "").encode()).hexdigest() == orig_sha
 
-# ③ 编号守恒：live＋归档合起来 1..max 每号恰一条
+# 3) ID conservation: live + archives together must be 1..max,
+#    exactly one row per ID
 nums = sorted(all_ids)
-assert nums == list(range(1, max(nums) + 1)), "编号缺口或重复"
+assert nums == list(range(1, max(nums) + 1)), "gap or duplicate in IDs"
 
-# ④ 任务行守恒 ＋ 可寻址（区间行按 T(\d+)[–-]T?(\d+) 展开后须覆盖 1..N）
+# 4) Task-row conservation + addressability (range rows expanded via
+#    T(\d+)[–-]T?(\d+) must cover 1..N)
 assert len(orig_rows) == len(archived_rows) + len(kept_rows)
 ```
 
-## 迁移脚本的形状（参考）
+## The shape of a migration script (reference)
 
-出处项目的两份一次性脚本（各 ~150 行）按这个骨架写：幂等断言（检测到已迁移就拒跑）→ 内容锚定取节 → 组装新 live 与归档体 → **全部断言** → 写归档并读回复核 → 写 live → 打印核数结果（块数/行数/字节数进提交信息）。照 §五 的断言片段拼即可。
+The source project's two one-shot scripts (~150 lines each) follow this skeleton: idempotency assertion (refuse to run if the migration already happened) → content-anchored section extraction → assemble the new live file and archive bodies → **all assertions** → write archives and verify by reading back → write the live file → print the conservation numbers (chunk/line/byte counts go into the commit message). Assemble it from the snippets above.

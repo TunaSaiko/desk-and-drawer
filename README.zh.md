@@ -10,10 +10,10 @@
 
 本仓库是治这个病的一套**留在 markdown 里**的方案：
 
-- 一份方法论：[`PLAYBOOK.md`](PLAYBOOK.md)（桌面/抽屉分工、五条绑在必经动作上的规矩）
+- 一份方法论：[`PLAYBOOK.zh.md`](PLAYBOOK.zh.md)（桌面/抽屉分工、五条绑在必经动作上的规矩）
 - 两个脚本：[`tools/check_doc_size.py`](tools/check_doc_size.py)（体积门禁，**报红＝轮转的唯一触发**）、[`tools/build_decisions_index.py`](tools/build_decisions_index.py)（决策索引，机械生成、确定性输出）
 - 四份起步模板：[`templates/`](templates/)（决策账本／进度看板／agent 入口文档／归档目录）
-- 一份迁移手册：[`MIGRATION.md`](MIGRATION.md)（给已经长大的项目，含"只挪不改"的机械核数代码片段）
+- 一份迁移手册：[`MIGRATION.zh.md`](MIGRATION.zh.md)（给已经长大的项目，含"只挪不改"的机械核数代码片段）
 
 ## 这不是什么（相关工作对照）
 
@@ -39,7 +39,7 @@
 4. 从第一条决策起就守规矩：一条一行、编号连续、append-only。
 5. 门禁报红时照红字里的处方轮转——**不许调预算了事**。
 
-已经长大的项目 → 直接看 [`MIGRATION.md`](MIGRATION.md)。
+已经长大的项目 → 直接看 [`MIGRATION.zh.md`](MIGRATION.zh.md)。
 
 ## 怎么绑进日常（纪律必须挂在必经动作上）
 

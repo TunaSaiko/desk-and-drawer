@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""文档体积与归档生命周期门禁（通用版）。方法论见仓库根的 PLAYBOOK.md。
+"""文档体积与归档生命周期门禁（通用版）。方法论见仓库根的 PLAYBOOK.zh.md（English/日本語: PLAYBOOK.md / PLAYBOOK.ja.md）。
 
-**报红 = 轮转的唯一触发**（PLAYBOOK §三-4：刻意单触发，避免"条数规则"与
+**报红 = 轮转的唯一触发**（PLAYBOOK.zh.md §三-4：刻意单触发，避免"条数规则"与
 "体积规则"两个触发器打架）。每条红都随文给处方；不许调预算了事——调预算
 应在你的项目里走决策留痕。
 
@@ -12,7 +12,7 @@
   ④ 归档任务行卫生：行行已关账、无自相矛盾  【硬错】
   ⑤ 决策索引新鲜度：确定性重建 == 落盘内容  【硬错】
 
-两条实测教训（PLAYBOOK §六）：
+两条实测教训（PLAYBOOK.zh.md §六）：
   - 预算按**字节**（os.path.getsize），行长按**字符**（Python len）——单位不同，
     报数字时说清（BSD awk length 数的是字节，别拿它对 Python len）。
   - "配置了但文件不存在"判红；"没配置"跳过；**全部跳过时大声说"没有任何
@@ -47,9 +47,9 @@ CONFIG = {
     },
     # ①② 超限时打印的处方（按文件；缺省用 DEFAULT 那条）
     "prescriptions": {
-        "docs/PROGRESS.md": "按 PLAYBOOK §三：收官节/已关账行/旧更新移入 docs/archive/，原地留指针或区间行",
-        "docs/DECISIONS.md": "按 PLAYBOOK §三：最老的 20–30 条移入对应百段档案，然后重跑 build_decisions_index.py",
-        "DEFAULT": "按 PLAYBOOK §三 轮转对应历史进 docs/archive/",
+        "docs/PROGRESS.md": "按 PLAYBOOK.zh.md §三：收官节/已关账行/旧更新移入 docs/archive/，原地留指针或区间行",
+        "docs/DECISIONS.md": "按 PLAYBOOK.zh.md §三：最老的 20–30 条移入对应百段档案，然后重跑 build_decisions_index.py",
+        "DEFAULT": "按 PLAYBOOK.zh.md §三 轮转对应历史进 docs/archive/",
     },
     # ③⑤ 决策账本；不用账本模式就整段设为 None
     "ledger": {
@@ -149,7 +149,7 @@ def check_line_lengths(problems, notes, skipped):
         bad = _line_verdict(lengths, limit)
         if bad:
             where = "、".join("第 %d 行（%s 字符）" % (i, format(n, ",")) for i, n in bad[:3])
-            problems.append("② 单行超限：%s %s > %s —— 这是「行内续写」单行怪物的形态，按 PLAYBOOK §三-1 整行替换＋归档"
+            problems.append("② 单行超限：%s %s > %s —— 这是「行内续写」单行怪物的形态，按 PLAYBOOK.zh.md §三-1 整行替换＋归档"
                             % (rel, where, format(limit, ",")))
         else:
             notes.append("② %s ✅ 最长行 %s / %s 字符" % (rel, format(max(lengths), ","), format(limit, ",")))
@@ -281,7 +281,7 @@ def main():
         print("\n❌ 发现 %d 处硬错：\n" % len(problems))
         for p in problems:
             print("  • " + p)
-        print("\n处方在每条红后面；轮转规矩见 PLAYBOOK.md §三。不许调预算了事。")
+        print("\n处方在每条红后面；轮转规矩见 PLAYBOOK.zh.md §三。不许调预算了事。")
         return 1
     if not notes:
         print("\n⚠️ 没有任何检查生效（全部未配置/跳过）——exit 0 不等于『已治理』，去改 CONFIG。")

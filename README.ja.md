@@ -10,10 +10,10 @@ Claude Code / Codex / Cursor などで長期間 AI 協働を回すプロジェ�
 
 本リポジトリはその処方箋です。すべて人間が読める git ネイティブな markdown のまま：
 
-- 方法論：[`PLAYBOOK.md`](PLAYBOOK.md)——机/引き出しのアーキテクチャと、必経アクションに結び付けた五つのルール（現在は中国語、翻訳予定）
+- 方法論：[`PLAYBOOK.ja.md`](PLAYBOOK.ja.md)——机/引き出しのアーキテクチャと、必経アクションに結び付けた五つのルール
 - スクリプト二つ：[`tools/check_doc_size.py`](tools/check_doc_size.py)（サイズゲート——**赤＝ローテーションの唯一のトリガー**）、[`tools/build_decisions_index.py`](tools/build_decisions_index.py)（台帳インデックスの機械生成、決定的出力）
 - スターターテンプレート四つ：[`templates/`](templates/)——意思決定台帳／進捗ボード／エージェント入口ドキュメント／アーカイブディレクトリ
-- 移行マニュアル：[`MIGRATION.md`](MIGRATION.md)——すでに肥大化したプロジェクト向け、コピペで使える保存則アサーション付き（現在は中国語）
+- 移行マニュアル：[`MIGRATION.ja.md`](MIGRATION.ja.md)——すでに肥大化したプロジェクト向け、コピペで使える保存則アサーション付き
 
 ## これは何でないか（関連プロジェクト）
 
@@ -39,7 +39,7 @@ Claude Code / Codex / Cursor などで長期間 AI 協働を回すプロジェ�
 4. 最初の決定からルールを守る：一決定一行・番号は連番・追記専用（append-only）。
 5. ゲートが赤になったら、赤字の処方どおりにローテーション——**バジェットを上げて誤魔化さない**。
 
-すでに肥大化したプロジェクト → [`MIGRATION.md`](MIGRATION.md) へ。
+すでに肥大化したプロジェクト → [`MIGRATION.ja.md`](MIGRATION.ja.md) へ。
 
 ## 日常への組み込み（規律は必経アクションに載せる）
 

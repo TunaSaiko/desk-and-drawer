@@ -1,57 +1,60 @@
-# 方法论：AI 协作项目的文档体积治理
+**English** ｜ [简体中文](PLAYBOOK.zh.md) ｜ [日本語](PLAYBOOK.ja.md)
 
-> 被 fork 进具体项目后，以该项目内的规则文档为准；本文件是上游模板。
+# The Playbook: Doc Size Governance for AI-Collaboration Projects
 
-## 一、问题与根因
+> Once forked into a real project, that project's own rules doc wins; this file is the upstream template.
+> Section numbers are parallel across the three languages (§1 here = §一 in Chinese = §1 in Japanese).
 
-长期 AI 协作项目的权威文档（进度看板、决策账本）**只要有"怎么记"的规则、没有"怎么归档"的规则，就必然无限变长**——这不是谁犯懒，是构造出来的必然：append-only 而无轮转，增长无上界。
+## 1. The problem and its root cause
 
-典型结局（真实案例数字见 README）：看板数百 KB、单行被历任 agent"行内续写"到几万字节。后果三连：读文件占用上下文过高 → 信息读取不全 → 信息抓取有误。**每一任新接手的 agent 都要付一遍这个税。**
+In a long-running AI-collaboration project, the authoritative docs — the progress board, the decision ledger — **grow without bound whenever they have rules for writing but no rules for archiving**. Nobody is being lazy; it is structural: append-only with no rotation has no upper bound by construction.
 
-## 二、目标架构：桌面 / 抽屉分工
+The typical endgame (real numbers in the README): a board of several hundred KB, and a single line that successive agents kept "appending in place" until it reached tens of thousands of bytes. The consequences come as a chain: reading the file floods the context window → information gets read incompletely → information gets read *wrongly*. **Every newly onboarded agent pays this tax again.**
 
-| 层 | 放什么 | 体积要求 |
+## 2. Target architecture: desk vs drawer
+
+| Layer | What lives there | Size policy |
 |---|---|---|
-| **入口文档**（HANDOFF / CLAUDE.md 类） | 只讲"怎么接手"，零动态状态 | 小而稳（参照 OpenAI Codex：32KiB 硬上限） |
-| **当前真相**（PROGRESS 类） | 现在的阶段/在飞任务/欠账/候选池 | 有字节预算，超了就轮转 |
-| **账本 live 段**（DECISIONS 类） | 最近约 30 条决策 | 有字节预算 |
-| **索引**（derived） | 一行一条的机械生成摘要 | 可随时重建，**不是权威** |
-| **归档** `docs/archive/` | 一切历史流水（append-only） | 不设限——冷存储，按需 grep 定点读 |
+| **Entry doc** (HANDOFF / CLAUDE.md style) | Only "how to take over"; zero dynamic state | Small and stable (cf. OpenAI Codex's hard 32 KiB cap) |
+| **Current truth** (PROGRESS style) | The present stage / in-flight tasks / debts / backlog | Byte budget; rotate when exceeded |
+| **Ledger, live segment** (DECISIONS style) | The ~30 most recent decisions | Byte budget |
+| **Index** (derived) | One-line-per-entry, mechanically generated summary | Rebuildable at any time; **never authoritative** |
+| **Archive** `docs/archive/` | All historical logs (append-only) | No limit — cold storage, grep on demand |
 
-读取纪律与架构配套：**历史一律按需 grep、不通读**；agent 读大文档先取标题大纲、再定点读小节。
+The reading discipline matches the architecture: **history is grepped on demand, never read cover to cover**; when an agent reads a large doc, it takes the heading outline first, then reads targeted sections.
 
-## 三、五条规矩（每条都绑在必经动作上，不靠"想起来"）
+## 3. Five rules, each bound to a mandatory action (never to "remembering")
 
-1. **状态行整行替换、禁止行内续写**。被替换的旧行当场原文追加到归档文件。单行怪物就是"续写惯例"制造出来的。
-2. **做完就归档**：阶段收官 → 该节整节移入归档、原地留一行指针；任务关账 → 表行移入归档、并入区间行（如 `T1–T115`）——区间行让"每个任务在表里可寻址"这类既有校验继续成立。
-3. **账本按百分段归档**（D001–D100 一档，按编号即知在哪档），live 只留最近约 30 条；配一份**机械生成、确定性输出**的索引（确定性 = 同输入必同输出、不带时间戳，于是"重新生成 == 落盘内容"可以当新鲜度判据）。
-4. **体积由门禁机械看守，报红是轮转的唯一触发**。纪律写进日志没用——它必须绑在脚本上。刻意单触发：不设"条数到 N"之类的第二触发器，避免两条规则打架。门禁上线要做**阳性＋阴性校准**（故意注入错误确认抓得到、确认正常流程不误报），并在启用当天做一次真实阳性对照（临时把预算压到当前值以下 → 报红 → 恢复 → 绿）。
-5. **迁移与轮转三铁律**：
-   - **只挪不改**：纯移动、拼接可复核（sha256 / multiset 断言，见 MIGRATION.md 的代码片段）；
-   - **编号不动**：决策号/任务号永不改，全仓交叉引用不断；
-   - **脚本核数**：移完机械验证每个编号仍在、总数不变——**断言不过就不落盘**。
-   另有一条总原则：**归档 ≠ 删除**。档案同为 append-only；要取代归档中的结论，在 live 新增条目注明取代关系，原文不动。
+1. **The status line is replaced whole; appending in place is forbidden.** The replaced old line is appended verbatim to the archive file on the spot. The single-line monster is exactly what the "append in place" habit manufactures.
+2. **Done means archived**: when a stage closes, its whole section moves to the archive, leaving a one-line pointer in place; when a task closes, its table row moves to the archive and folds into a range row (e.g. `T1–T115`) — the range row keeps existing checks like "every task is addressable in the table" satisfied.
+3. **The ledger archives in blocks of one hundred** (D001–D100 per file — the number alone tells you which file), and the live file keeps only the ~30 most recent entries, paired with a **mechanically generated, deterministic** index (deterministic = same input, same output, no timestamps — so "regenerate == file on disk" doubles as a freshness check).
+4. **Size is guarded by a gate script, and a red is the single rotation trigger.** Discipline written into a log does nothing — it must ride on a script. Deliberately a *single* trigger: no second trigger like "N entries reached", so two rules can never fight. When the gate goes live, calibrate with **positives and negatives** (inject a real violation to prove it catches; prove normal flow doesn't false-alarm), and run one real positive control the day you enable it (temporarily push the budget below the current size → red → restore → green).
+5. **Three iron rules for migration and rotation**:
+   - **Move, never edit**: pure relocation, mechanically re-checkable (sha256 / multiset assertions — see the snippets in MIGRATION.md);
+   - **Numbers never change**: decision and task IDs are permanent, so every cross-reference in the repo survives;
+   - **Script-verified conservation**: after moving, mechanically verify every ID still exists and the total is unchanged — **if an assertion fails, nothing is written to disk**.
+   And one umbrella principle: **archiving ≠ deleting**. Archives are append-only too; to supersede an archived conclusion, add a new entry in the live doc naming what it replaces — the original text stays untouched.
 
-## 四、新项目第一天怎么起步
+## 4. Day one on a new project
 
-- 建 `docs/` ＋ `docs/archive/`；入口文档写死"固定阅读顺序"，历史一律进归档、按需 grep。
-- 决策账本第一天就按"一条一行＋编号连续"起步；写清 append-only 与取代规则。
-- 门禁脚本第一周就上（预算可以先宽后紧）；预算数值 = 实测体积 × 1.5–2.5 余量。
-- 也可以直接用现成工具起步（新项目零迁移成本是它们的最佳场景）：Beads（git 内嵌的 agent 任务库）、Backlog.md（一任务一 markdown）、OpenSpec（Propose→Apply→Archive 生命周期）。**中途迁移则要慎重**——本方法论的出处项目评估后选择了不换工具、只立规矩。
+- Create `docs/` + `docs/archive/`; the entry doc pins a fixed reading order, and history always goes to the archive, grepped on demand.
+- Start the decision ledger on day one with "one line per decision, contiguous numbering"; write down the append-only and supersession rules.
+- Bring the gate script in within the first week (budgets can start loose and tighten later); budget = measured size × 1.5–2.5 headroom.
+- You can also just start with an existing tool (zero migration cost on a fresh project is their best case): Beads (a git-embedded task database for agents), Backlog.md (one task, one markdown file), OpenSpec (the Propose → Apply → Archive lifecycle). **Mid-flight migration is another matter** — the project this playbook comes from evaluated the options and chose to keep its tools and just adopt the rules.
 
-## 五、已长大的项目怎么迁移
+## 5. Migrating a project that has already grown
 
-见 `MIGRATION.md`（五步顺序＋断言代码片段）。最重要的三句话提前说：
+See `MIGRATION.md` (the five-step order plus assertion snippets). The three sentences that matter most, up front:
 
-- 迁移脚本**按内容锚定，不用行号**——多会话并行时行号随时被别人推移（出处项目迁移当天就撞上一次）。
-- **依赖这些文档的工具要在同一提交里跟上语料范围**——出处项目有个"前作体检"工具以任务表为语料，任务行归档后若不并上归档文件，它的立身案例自己就会漏报。
-- 每步之间：全部门禁绿 → 提交 → 推远端。
+- Migration scripts **anchor on content, never on line numbers** — with multiple sessions working in parallel, someone else can shift your line numbers at any moment (the source project got hit by exactly this on migration day).
+- **Any tool that reads these docs must have its corpus extended in the same commit** — the source project had a "prior-art check" tool whose corpus was the task table; had the archived rows not been folded in, the tool's own founding case would have become a false negative.
+- Between every step: all gates green → commit → push.
 
-## 六、给门禁写红字的规矩
+## 6. Writing the red text
 
-每条红必须**随文给处方**（"超了 → 去做哪个动作"），而不是只报"超了"。会喊狼来了的门禁比没有门禁更糟；同理，**会假绿的量尺比没有量尺更糟**——校准时永远带一条"拿从没改过的东西试一下，确认量尺量得到"的对照。
+Every red must **carry its prescription inline** ("over budget → go do this specific action"), not just report "over". A gate that cries wolf is worse than no gate; likewise, **a measuring stick that can silently report green is worse than no stick** — every calibration includes one control of the form "test something that was never changed, and confirm the stick can actually measure it".
 
-两个实测教训，写死进工具注释：
+Two field lessons, now hard-coded into the tool comments:
 
-- BSD `awk length` 数的是**字节**，Python `len` 数的是**字符**——报数字先说清单位；
-- 门禁"全部跳过"不等于"通过"：未配置就全 skip 时要大声说"没有任何检查生效"，否则 exit 0 会被读成"已治理"。
+- BSD `awk length` counts **bytes**; Python `len` counts **characters** — state the unit before you report a number;
+- "All checks skipped" is not "passed": when nothing is configured and everything skips, say loudly that *no check took effect* — otherwise exit 0 gets read as "governed".

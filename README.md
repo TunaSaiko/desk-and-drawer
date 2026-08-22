@@ -10,10 +10,10 @@ Long-running AI-collaboration projects (Claude Code / Codex / Cursor…) accumul
 
 This repo is the cure, and everything stays in human-readable, git-native markdown:
 
-- A methodology: [`PLAYBOOK.md`](PLAYBOOK.md) — the desk/drawer architecture and five rules bound to mandatory checkpoints *(currently in Chinese; translation planned)*
+- A methodology: [`PLAYBOOK.md`](PLAYBOOK.md) — the desk/drawer architecture and five rules bound to mandatory checkpoints
 - Two scripts: [`tools/check_doc_size.py`](tools/check_doc_size.py) (the size gate — **a red is the single rotation trigger**) and [`tools/build_decisions_index.py`](tools/build_decisions_index.py) (a deterministic, mechanically generated ledger index)
 - Four starter templates: [`templates/`](templates/) — decision ledger / progress board / agent entry doc / archive directory
-- A migration manual: [`MIGRATION.md`](MIGRATION.md) — for projects that have already grown out of control, with copy-paste conservation assertions *(currently in Chinese)*
+- A migration manual: [`MIGRATION.md`](MIGRATION.md) — for projects that have already grown out of control, with copy-paste conservation assertions
 
 ## What this is not (related work)
 
